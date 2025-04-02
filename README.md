@@ -1,46 +1,135 @@
-# Getting Started with Create React App
+# Редактор параметров товара (React-решение)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Описание проекта
 
-## Available Scripts
+Реализация редактора параметров товара на React с TypeScript, соответствующая техническому заданию. Решение позволяет редактировать параметры товара и получать их актуальные значения.
 
-In the project directory, you can run:
+## Реализованная функциональность
 
-### `npm start`
+### Основные компоненты
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. **ParamEditor** - классовый компонент, реализующий основную логику:
+   - Принимает параметры (`params`) и начальные значения (`model`) через props
+   - Отображает все параметры в виде редактируемых полей
+   - Предоставляет метод `getModel()` для получения текущих значений
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+2. **App** - функциональный компонент-обёртка:
+   - Содержит тестовые данные
+   - Обеспечивает демонстрацию работы редактора
+   - Добавляет кнопку для проверки текущего состояния модели
 
-### `npm test`
+### Типы данных
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```typescript
+interface Param {
+  id: number;
+  name: string;
+  type: 'string';
+}
 
-### `npm run build`
+interface ParamValue {
+  paramId: number;
+  value: string;
+}
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+interface Model {
+  paramValues: ParamValue[];
+  colors: Color[];
+}
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Ключевые особенности реализации
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **Работа с параметрами**:
+   - Все параметры из `props.params` отображаются сразу
+   - Значения из `props.model.paramValues` подставляются в соответствующие поля
+   - Отсутствующие значения инициализируются пустой строкой
 
-### `npm run eject`
+2. **Редактирование**:
+   - Поля ввода реагируют на изменения
+   - Состояние компонента обновляется при каждом изменении
+   - Поддержка контроля вводимых значений (controlled components)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+3. **Получение данных**:
+   - Метод `getModel()` возвращает полную текущую модель
+   - В возвращаемом объекте присутствуют все параметры
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. **Расширяемость**:
+   - Архитектура позволяет легко добавлять новые типы параметров
+   - Типизация помогает поддерживать целостность данных
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Как использовать
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+1. **Инициализация редактора**:
+```tsx
+<ParamEditor 
+  params={arrayOfParams} 
+  model={initialModel} 
+  ref={editorRef}
+/>
+```
 
-## Learn More
+2. **Получение текущих значений**:
+```tsx
+const currentModel = editorRef.current?.getModel();
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Пример данных
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```typescript
+const params: Param[] = [
+  { id: 1, name: "Назначение", type: 'string' },
+  { id: 2, name: "Длина", type: 'string' },
+  { id: 3, name: "Цвет", type: 'string' }
+];
+
+const model: Model = {
+  paramValues: [
+    { paramId: 1, value: "повседневное" },
+    { paramId: 2, value: "макси" }
+  ],
+  colors: []
+};
+```
+
+## Проверка работы
+
+1. Редактор отображает все параметры из `params`
+2. Поля с существующими значениями из `model` заполнены
+3. Пустые поля можно редактировать
+4. При вызове `getModel()` возвращаются все текущие значения
+
+## Расширение функциональности
+
+Для добавления новых типов параметров:
+
+1. Расширить тип `Param`:
+```typescript
+type ParamType = 'string' | 'number' | 'select';
+```
+
+2. Модифицировать метод render:
+```typescript
+private renderInput(param: Param) {
+  switch(param.type) {
+    case 'number':
+      return <input type="number" />;
+    case 'select':
+      return <select>{...options}</select>;
+    default:
+      return <input type="text" />;
+  }
+}
+```
+
+## Установка и запуск
+
+1. Клонировать репозиторий
+2. Установить зависимости: `npm install`
+3. Запустить приложение: `npm start`
+
+## Технологии
+
+- React
+- TypeScript
+- CSS-модули
